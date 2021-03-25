@@ -56,10 +56,13 @@ func Get(refPath string) error {
 		return fmt.Errorf("unable to download file: %w", err)
 	}
 
+	spinner.Start(" unpack", "reconstructing")
 	archiveToStore, err := archive.LoadArchiveObject(*archiveBlob)
 	if err != nil {
+		spinner.StopFail("failed")
 		return fmt.Errorf("unable to understand archive: %w", err)
 	}
+	spinner.Stop("done")
 
 	spinner.Start(" decrypt", "doing math")
 	decryptedContent, err := crypto.DecryptBlob(archiveToStore.Content, key64)
@@ -110,18 +113,19 @@ func downloadShareable(shareableRef *shareablepath.RefPath) (*[]byte, error) {
 	request.Header.Set("User-Agent", fmt.Sprintf("Soubise/%v", buildinfo.Version))
 
 	client := &http.Client{}
-	spinner.Update("downloading")
+	spinner.Update("decoding")
 	response, err := client.Do(request)
 	if err != nil {
 		spinner.StopFail("failed to download")
 		return nil, fmt.Errorf("unable to download from server: %w", err)
 	}
-	spinner.Stop("done")
 
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
+		spinner.StopFail("failed")
 		return nil, fmt.Errorf("unable to parse response: %w", err)
 	}
+	spinner.Stop("done")
 
 	return &body, nil
 }
