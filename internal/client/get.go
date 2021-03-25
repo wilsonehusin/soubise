@@ -120,6 +120,8 @@ func downloadShareable(shareableRef *shareablepath.RefPath) (*[]byte, error) {
 		return nil, fmt.Errorf("unable to download from server: %w", err)
 	}
 
+	// TODO: HTTP status checks?
+
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		spinner.StopFail("failed")

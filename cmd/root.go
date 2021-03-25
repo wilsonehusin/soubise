@@ -20,6 +20,8 @@ import (
 	"bytes"
 	"math/rand"
 	"os"
+	"path"
+	"strconv"
 	"time"
 
 	"github.com/kelseyhightower/envconfig"
@@ -89,6 +91,10 @@ func rootCmdInit(cmd *cobra.Command, args []string) error {
 	if rootOpts.Debug {
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 		log.Logger = log.With().Caller().Logger()
+		zerolog.CallerMarshalFunc = func(file string, line int) string {
+			return path.Base(file) + ":" + strconv.Itoa(line)
+		}
+
 	} else {
 		zerolog.SetGlobalLevel(zerolog.InfoLevel)
 	}
