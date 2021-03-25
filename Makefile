@@ -25,12 +25,12 @@ DOCKER_TAGS=--tag $(CONTAINER_REGISTRY)/soubise:latest --tag $(CONTAINER_REGISTR
 all: build container
 
 .PHONY: testbuild
-testbuild: GIT_TAG:=test-$(GIT_TAG)
+testbuild: GIT_TAG:=zz_test-$(GIT_TAG)
 testbuild: BUILD_FLAGS:=$(TEST_BUILD_FLAGS)
 testbuild: build
 
 .PHONY: testmultibuild
-testmultibuild: GIT_TAG:=test-$(GIT_TAG)
+testmultibuild: GIT_TAG:=zz_test-$(GIT_TAG)
 testmultibuild: BUILD_FLAGS:=-ldflags '$(VERSION_FLAG) $(GIT_SHA_FLAG) $(COMPILER_FLAG) $(SERVER_FLAG)'
 testmultibuild: multibuild
 
