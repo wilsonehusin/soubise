@@ -12,10 +12,10 @@ GOVERSION=$(shell go env GOVERSION)
 REPO_ROOT=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 SOUBISE_IMAGES=$(shell docker image ls --all --format "{{.Repository}}:{{.Tag}}" | grep soubise)
 
-VERSION_FLAG:=-X=$(GOTARGET)/internal/buildinfo.Version=$(GIT_TAG)
-GIT_SHA_FLAG:=-X=$(GOTARGET)/internal/buildinfo.GitSHA=$(GIT_SHA)
-SERVER_FLAG:=-X=$(GOTARGET)/internal/buildinfo.Server=$(DEFAULT_SERVER)
-COMPILER_FLAG:=-X=$(GOTARGET)/internal/buildinfo.Go=$(GOVERSION)
+VERSION_FLAG=-X=$(GOTARGET)/internal/buildinfo.Version=$(GIT_TAG)
+GIT_SHA_FLAG=-X=$(GOTARGET)/internal/buildinfo.GitSHA=$(GIT_SHA)
+SERVER_FLAG=-X=$(GOTARGET)/internal/buildinfo.Server=$(DEFAULT_SERVER)
+COMPILER_FLAG=-X=$(GOTARGET)/internal/buildinfo.Go=$(GOVERSION)
 
 BUILD_FLAGS=-ldflags '$(VERSION_FLAG) $(GIT_SHA_FLAG) $(COMPILER_FLAG)'
 TEST_BUILD_FLAGS=-ldflags '$(VERSION_FLAG) $(GIT_SHA_FLAG) $(COMPILER_FLAG) $(SERVER_FLAG)'
@@ -25,9 +25,14 @@ DOCKER_TAGS=--tag $(CONTAINER_REGISTRY)/soubise:latest --tag $(CONTAINER_REGISTR
 all: build container
 
 .PHONY: testbuild
-testbuild: VERSION_FLAG:=$(VERSION_FLAG)-test
+testbuild: GIT_TAG:=test-$(GIT_TAG)
 testbuild: BUILD_FLAGS:=$(TEST_BUILD_FLAGS)
 testbuild: build
+
+.PHONY: testmultibuild
+testmultibuild: GIT_TAG:=test-$(GIT_TAG)
+testmultibuild: BUILD_FLAGS:=-ldflags '$(VERSION_FLAG) $(GIT_SHA_FLAG) $(COMPILER_FLAG) $(SERVER_FLAG)'
+testmultibuild: multibuild
 
 .PHONY: build
 build:
