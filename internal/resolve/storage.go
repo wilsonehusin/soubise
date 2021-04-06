@@ -35,7 +35,7 @@ func NewStorageFromPath(storagePath string, b broker.Broker) storage.Storage {
 	switch {
 	case storagePath == "inmemory":
 		s = storage.NewInMemoryStorage(b)
-		log.Warn().Dict("Storage", zerolog.Dict().Str("Kind", s.Kind())).Msg("do NOT use in production")
+		log.Warn().Dict("Storage", zerolog.Dict().Str("Kind", s.Kind())).Msg("do NOT use in production, data is NOT persistent")
 	case strings.HasPrefix(storagePath, "file://"):
 		s = storage.NewLocalFsStorage(b, storagePath[7:])
 	case strings.HasPrefix(storagePath, "s3://"):
