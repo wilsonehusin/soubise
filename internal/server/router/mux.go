@@ -18,6 +18,7 @@ package router
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"net/http"
 
@@ -26,6 +27,7 @@ import (
 
 	"github.com/wilsonehusin/soubise/internal/server/middleware"
 	"github.com/wilsonehusin/soubise/internal/server/routes"
+	"github.com/wilsonehusin/soubise/pkg/archive"
 	"github.com/wilsonehusin/soubise/pkg/storage"
 )
 
@@ -63,6 +65,8 @@ func createObject(w http.ResponseWriter, r *http.Request) {
 			Str("Action", "create")).
 		Msg("processing archive")
 
+	// TODO: process expiry checks
+
 	id, err := storage.Create(bodyBuffer.Bytes())
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -94,6 +98,24 @@ func getObject(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		requestLogger(r).Error().
 			Err(err).Send()
+		return
+	}
+
+	objArchive, err := archive.LoadArchiveObject(obj)
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		requestLogger(r).Error().
+			Err(err).Send()
+		return
+	}
+
+	if objArchive.HasExpired() {
+		w.WriteHeader(http.StatusNotFound)
+		requestLogger(r).Error().Err(fmt.Errorf("expired object was requested")).Send()
+		requestLogger(r).Info().Msg("deleting expired object")
+		if err := storage.Delete(id); err != nil {
+			requestLogger(r).Error().Err(err).Msg("unsuccessful deletion")
+		}
 		return
 	}
 

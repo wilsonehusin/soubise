@@ -20,12 +20,10 @@ import (
 	"sync"
 )
 
-const inMemoryBrokerName = "inmemory"
-
 type InMemoryBroker struct {
 	sync.RWMutex
 }
 
 func (i *InMemoryBroker) Kind() string {
-	return inMemoryBrokerName
+	return "inmemory"
 }

@@ -98,7 +98,7 @@ func writeToFile(name string, content []byte) error {
 }
 
 func downloadShareable(shareableRef *shareablepath.RefPath) (*[]byte, error) {
-	spinner.Start(" download", "preparing request")
+	spinner.Start(" download", "resolving path")
 	uriBuilder, err := url.Parse(shareableRef.Server)
 	if err != nil {
 		spinner.StopFail("unable to parse server")
@@ -113,7 +113,7 @@ func downloadShareable(shareableRef *shareablepath.RefPath) (*[]byte, error) {
 	request.Header.Set("User-Agent", fmt.Sprintf("Soubise/%v", buildinfo.Version))
 
 	client := &http.Client{}
-	spinner.Update("decoding")
+	spinner.Update("pulling data")
 	response, err := client.Do(request)
 	if err != nil {
 		spinner.StopFail("failed to download")

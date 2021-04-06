@@ -20,8 +20,6 @@ import (
 	"github.com/wilsonehusin/soubise/pkg/broker"
 )
 
-const inMemoryStorageName = "inmemory"
-
 type InMemoryStorage struct {
 	broker broker.Broker
 	data   map[string][]byte
@@ -34,30 +32,30 @@ func NewInMemoryStorage(b broker.Broker) Storage {
 	}
 }
 
-func (i *InMemoryStorage) Create(id string, value []byte) error {
-	i.broker.Lock()
-	i.data[id] = value
-	i.broker.Unlock()
+func (s *InMemoryStorage) Create(id string, value []byte) error {
+	s.broker.Lock()
+	s.data[id] = value
+	s.broker.Unlock()
 	return nil
 }
 
-func (i *InMemoryStorage) Get(id string) ([]byte, error) {
-	i.broker.RLock()
-	value := i.data[id]
-	i.broker.RUnlock()
+func (s *InMemoryStorage) Get(id string) ([]byte, error) {
+	s.broker.RLock()
+	value := s.data[id]
+	s.broker.RUnlock()
 	if value == nil {
 		return []byte{}, &StorageNotFoundError{}
 	}
 	return value, nil
 }
 
-func (i *InMemoryStorage) Delete(id string) error {
-	i.broker.Lock()
-	delete(i.data, id)
-	i.broker.Unlock()
+func (s *InMemoryStorage) Delete(id string) error {
+	s.broker.Lock()
+	delete(s.data, id)
+	s.broker.Unlock()
 	return nil
 }
 
-func (i *InMemoryStorage) Kind() string {
-	return inMemoryStorageName
+func (s *InMemoryStorage) Kind() string {
+	return "inmemory"
 }

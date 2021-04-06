@@ -29,30 +29,6 @@ type Storage interface {
 	Kind() string
 }
 
-type InitializedStorageError struct{}
-
-const InitializedStorageErrorString = "modifications to initialized storage is not allowed"
-
-func (i *InitializedStorageError) Error() string {
-	return InitializedStorageErrorString
-}
-
-type UninitializedStorageError struct{}
-
-const UninitializedStorageErrorString = "storageProvider has not been initalized"
-
-func (u *UninitializedStorageError) Error() string {
-	return UninitializedStorageErrorString
-}
-
-type StorageNotFoundError struct{}
-
-const StorageNotFoundErrorString = "unable to find archive with such key"
-
-func (u *StorageNotFoundError) Error() string {
-	return StorageNotFoundErrorString
-}
-
 func SetStorage(s Storage) error {
 	if storageProvider != nil {
 		return &InitializedStorageError{}
@@ -65,7 +41,7 @@ func Create(data []byte) (string, error) {
 	if storageProvider == nil {
 		return "", &UninitializedStorageError{}
 	}
-	id := crypto.RandLen(16).String()
+	id := crypto.RandLen(18).String()
 	if err := storageProvider.Create(id, data); err != nil {
 		return "", err
 	}
@@ -91,4 +67,28 @@ func Kind() string {
 		return ""
 	}
 	return storageProvider.Kind()
+}
+
+type InitializedStorageError struct{}
+
+const InitializedStorageErrorString = "modifications to initialized storage is not allowed"
+
+func (i *InitializedStorageError) Error() string {
+	return InitializedStorageErrorString
+}
+
+type UninitializedStorageError struct{}
+
+const UninitializedStorageErrorString = "storageProvider has not been initalized"
+
+func (u *UninitializedStorageError) Error() string {
+	return UninitializedStorageErrorString
+}
+
+type StorageNotFoundError struct{}
+
+const StorageNotFoundErrorString = "unable to find archive with such key"
+
+func (u *StorageNotFoundError) Error() string {
+	return StorageNotFoundErrorString
 }
