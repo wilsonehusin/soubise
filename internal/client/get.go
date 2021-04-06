@@ -120,7 +120,10 @@ func downloadShareable(shareableRef *shareablepath.RefPath) (*[]byte, error) {
 		return nil, fmt.Errorf("unable to download from server: %w", err)
 	}
 
-	// TODO: HTTP status checks?
+	if response.StatusCode < 200 || response.StatusCode >= 300 {
+		spinner.StopFail("error")
+		return nil, fmt.Errorf("server did not process request successfully: %v", response.Status)
+	}
 
 	body, err := io.ReadAll(response.Body)
 	if err != nil {

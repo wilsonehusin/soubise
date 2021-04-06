@@ -77,10 +77,16 @@ func Share(pathToFile string, lifetime time.Duration, server string) error {
 		spinner.StopFail("failed to upload\n")
 		return err
 	}
+
+	defer response.Body.Close()
+
+	if response.StatusCode < 200 || response.StatusCode >= 300 {
+		spinner.StopFail("error")
+		return fmt.Errorf("server did not process request successfully: %v", response.Status)
+	}
 	spinner.Stop("done")
 	printer.Stdout("\n")
 
-	defer response.Body.Close()
 	rawBody, err := io.ReadAll(response.Body)
 	if err != nil {
 		return fmt.Errorf("unable to read response from server: %w", err)
