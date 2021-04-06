@@ -17,8 +17,6 @@ limitations under the License.
 package storage
 
 import (
-	"path"
-
 	"github.com/peterbourgon/diskv/v3"
 
 	"github.com/wilsonehusin/soubise/pkg/broker"
@@ -33,7 +31,7 @@ func NewLocalFsStorage(b broker.Broker, basePath string) Storage {
 	return &LocalFsStorage{
 		broker: b,
 		backend: diskv.New(diskv.Options{
-			BasePath: path.Join(basePath, "soubisedata"),
+			BasePath: basePath,
 			Transform: func(s string) []string {
 				top := s[0:2]
 				sub := s[2:4]
