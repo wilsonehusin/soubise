@@ -46,8 +46,11 @@ func NewLocalFsStorage(b broker.Broker, basePath string) Storage {
 
 func (s *LocalFsStorage) Create(id string, data []byte) error { // TODO: use stream?
 	s.broker.Lock()
-	s.backend.Write(id, data)
+	err := s.backend.Write(id, data)
 	s.broker.Unlock()
+	if err != nil {
+		return err
+	}
 	return nil
 }
 func (s *LocalFsStorage) Get(id string) ([]byte, error) { // TODO: use stream?
