@@ -30,12 +30,12 @@ import (
 
 	"github.com/dustin/go-humanize"
 
+	"github.com/wilsonehusin/soubise/internal"
 	"github.com/wilsonehusin/soubise/internal/archive"
 	"github.com/wilsonehusin/soubise/internal/buildinfo"
 	"github.com/wilsonehusin/soubise/internal/crypto"
 	"github.com/wilsonehusin/soubise/internal/printer"
 	"github.com/wilsonehusin/soubise/internal/server/routes"
-	"github.com/wilsonehusin/soubise/internal/shareablepath"
 	"github.com/wilsonehusin/soubise/internal/spinner"
 )
 
@@ -92,14 +92,14 @@ func Share(pathToFile string, lifetime time.Duration, server string) error {
 		return fmt.Errorf("unable to read response from server: %w", err)
 	}
 	shareId := string(rawBody)
-	shareableRef := &shareablepath.RefPath{
+	claimTag := &internal.ClaimTag{
 		Server:        server,
 		Id:            shareId,
 		EncryptionKey: encryptionKey.String(),
 	}
 
 	printer.Stdout("Encrypted file has been stored successfully! Use the following to share:\n")
-	printer.Stdout("  %v\n", shareableRef.String())
+	printer.Stdout("  %v\n", claimTag.String())
 
 	return nil
 }

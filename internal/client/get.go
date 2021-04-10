@@ -26,32 +26,32 @@ import (
 
 	"github.com/dustin/go-humanize"
 
+	"github.com/wilsonehusin/soubise/internal"
 	"github.com/wilsonehusin/soubise/internal/archive"
 	"github.com/wilsonehusin/soubise/internal/buildinfo"
 	"github.com/wilsonehusin/soubise/internal/crypto"
 	"github.com/wilsonehusin/soubise/internal/printer"
 	"github.com/wilsonehusin/soubise/internal/server/routes"
-	"github.com/wilsonehusin/soubise/internal/shareablepath"
 	"github.com/wilsonehusin/soubise/internal/spinner"
 )
 
 func Get(refPath string) error {
-	shareableRef, err := shareablepath.Parse(refPath)
+	claimTag, err := internal.Parse(refPath)
 	if err != nil {
 		return err
 	}
-	uriBuilder, err := url.Parse(shareableRef.Server)
+	uriBuilder, err := url.Parse(claimTag.Server)
 	if err != nil {
 		return fmt.Errorf("unable to parse server: %w", err)
 	}
 	printer.Stdout("  Server: %v\n\n", uriBuilder.String())
 
-	key64, err := crypto.Base64FromString(shareableRef.EncryptionKey)
+	key64, err := crypto.Base64FromString(claimTag.EncryptionKey)
 	if err != nil {
 		return fmt.Errorf("unable to decode encryption key: %w", err)
 	}
 
-	archiveBlob, err := downloadShareable(shareableRef)
+	archiveBlob, err := downloadShareable(claimTag)
 	if err != nil {
 		return fmt.Errorf("unable to download file: %w", err)
 	}
@@ -97,14 +97,14 @@ func writeToFile(name string, content []byte) error {
 	return nil
 }
 
-func downloadShareable(shareableRef *shareablepath.RefPath) (*[]byte, error) {
+func downloadShareable(claimTag *internal.ClaimTag) (*[]byte, error) {
 	spinner.Start(" download", "resolving path")
-	uriBuilder, err := url.Parse(shareableRef.Server)
+	uriBuilder, err := url.Parse(claimTag.Server)
 	if err != nil {
 		spinner.StopFail("unable to parse server")
-		return nil, fmt.Errorf("unable to parse %s as url: %w", shareableRef.Server, err)
+		return nil, fmt.Errorf("unable to parse %s as url: %w", claimTag.Server, err)
 	}
-	uriBuilder.Path = path.Join(uriBuilder.Path, routes.GetObjectWithId(shareableRef.Id))
+	uriBuilder.Path = path.Join(uriBuilder.Path, routes.GetObjectWithId(claimTag.Id))
 	request, err := http.NewRequest("GET", uriBuilder.String(), nil)
 	if err != nil {
 		spinner.StopFail("unable to compose request")

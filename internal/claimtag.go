@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package shareablepath
+package internal
 
 import (
 	"encoding/base64"
@@ -23,7 +23,7 @@ import (
 	"strings"
 )
 
-type RefPath struct {
+type ClaimTag struct {
 	Server        string
 	Id            string
 	EncryptionKey string
@@ -34,15 +34,15 @@ const Prefix = "soubise://"
 
 var matcher = regexp.MustCompile(`soubise://(?P<host>[\w-_=]+)/(?P<id>[\w-_=]+)/(?P<encryptionKey>[\w-_=]+)/?(?P<ownerKey>[\w-_=]+)?`)
 
-func Parse(str string) (*RefPath, error) {
+func Parse(str string) (*ClaimTag, error) {
 	if !strings.HasPrefix(str, Prefix) {
-		return nil, &RefPathParseError{invalidRefPath: str}
+		return nil, &ClaimTagParseError{invalidClaimTag: str}
 	}
 
 	ownerKey := ""
 	match := matcher.FindStringSubmatch(str)
 	if len(match) < 4 {
-		return nil, &RefPathParseError{invalidRefPath: str}
+		return nil, &ClaimTagParseError{invalidClaimTag: str}
 	} else if len(match) < 5 {
 		ownerKey = match[4]
 	}
@@ -51,7 +51,7 @@ func Parse(str string) (*RefPath, error) {
 	if err != nil {
 		return nil, fmt.Errorf("decoding failed: %w", err)
 	}
-	return &RefPath{
+	return &ClaimTag{
 		Server:        string(decodedServer),
 		Id:            match[2],
 		EncryptionKey: match[3],
@@ -59,7 +59,7 @@ func Parse(str string) (*RefPath, error) {
 	}, nil
 }
 
-func (r *RefPath) String() string {
+func (r *ClaimTag) String() string {
 	suffix := ""
 	if r.OwnerKey != "" {
 		suffix = fmt.Sprintf("/%s", r.OwnerKey)
@@ -70,10 +70,10 @@ func (r *RefPath) String() string {
 	return fmt.Sprintf("%s%s/%s/%s%s", Prefix, encodedServer, r.Id, r.EncryptionKey, suffix)
 }
 
-type RefPathParseError struct {
-	invalidRefPath string
+type ClaimTagParseError struct {
+	invalidClaimTag string
 }
 
-func (r *RefPathParseError) Error() string {
-	return fmt.Sprintf("provided %s is not a valid RefPath", r.invalidRefPath)
+func (r *ClaimTagParseError) Error() string {
+	return fmt.Sprintf("provided %s is not a valid ClaimTag", r.invalidClaimTag)
 }
