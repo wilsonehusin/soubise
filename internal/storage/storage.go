@@ -17,7 +17,7 @@ limitations under the License.
 package storage
 
 import (
-	"github.com/wilsonehusin/soubise/pkg/crypto"
+	"github.com/wilsonehusin/soubise/internal/crypto"
 )
 
 var storageProvider Storage

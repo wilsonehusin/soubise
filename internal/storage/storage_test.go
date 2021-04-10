@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/wilsonehusin/soubise/pkg/broker"
+	"github.com/wilsonehusin/soubise/internal/broker"
 )
 
 var inMemoryBroker = &broker.InMemoryBroker{}

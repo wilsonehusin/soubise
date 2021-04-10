@@ -22,7 +22,7 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 
-	"github.com/wilsonehusin/soubise/pkg/broker"
+	"github.com/wilsonehusin/soubise/internal/broker"
 )
 
 func NewBrokerFromPath(brokerPath string) broker.Broker {

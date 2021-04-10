@@ -28,7 +28,7 @@ import (
 	"github.com/wilsonehusin/soubise/internal/resolve"
 	"github.com/wilsonehusin/soubise/internal/server"
 	"github.com/wilsonehusin/soubise/internal/server/router"
-	"github.com/wilsonehusin/soubise/pkg/storage"
+	"github.com/wilsonehusin/soubise/internal/storage"
 )
 
 const serverCmdName = "server"

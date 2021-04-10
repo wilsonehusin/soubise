@@ -17,7 +17,7 @@ limitations under the License.
 package storage
 
 import (
-	"github.com/wilsonehusin/soubise/pkg/broker"
+	"github.com/wilsonehusin/soubise/internal/broker"
 )
 
 type InMemoryStorage struct {

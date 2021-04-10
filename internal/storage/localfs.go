@@ -19,7 +19,7 @@ package storage
 import (
 	"github.com/peterbourgon/diskv/v3"
 
-	"github.com/wilsonehusin/soubise/pkg/broker"
+	"github.com/wilsonehusin/soubise/internal/broker"
 )
 
 type LocalFsStorage struct {

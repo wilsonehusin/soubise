@@ -26,13 +26,13 @@ import (
 
 	"github.com/dustin/go-humanize"
 
+	"github.com/wilsonehusin/soubise/internal/archive"
 	"github.com/wilsonehusin/soubise/internal/buildinfo"
+	"github.com/wilsonehusin/soubise/internal/crypto"
 	"github.com/wilsonehusin/soubise/internal/printer"
 	"github.com/wilsonehusin/soubise/internal/server/routes"
+	"github.com/wilsonehusin/soubise/internal/shareablepath"
 	"github.com/wilsonehusin/soubise/internal/spinner"
-	"github.com/wilsonehusin/soubise/pkg/archive"
-	"github.com/wilsonehusin/soubise/pkg/crypto"
-	"github.com/wilsonehusin/soubise/pkg/shareablepath"
 )
 
 func Get(refPath string) error {

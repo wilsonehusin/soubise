@@ -25,10 +25,10 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/rs/zerolog"
 
+	"github.com/wilsonehusin/soubise/internal/archive"
 	"github.com/wilsonehusin/soubise/internal/server/middleware"
 	"github.com/wilsonehusin/soubise/internal/server/routes"
-	"github.com/wilsonehusin/soubise/pkg/archive"
-	"github.com/wilsonehusin/soubise/pkg/storage"
+	"github.com/wilsonehusin/soubise/internal/storage"
 )
 
 func NewMux() http.Handler {

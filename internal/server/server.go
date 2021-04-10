@@ -17,7 +17,7 @@ limitations under the License.
 package server
 
 import (
-	"github.com/wilsonehusin/soubise/pkg/storage"
+	"github.com/wilsonehusin/soubise/internal/storage"
 )
 
 type Server interface {

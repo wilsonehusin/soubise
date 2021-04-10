@@ -22,8 +22,8 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 
-	"github.com/wilsonehusin/soubise/pkg/broker"
-	"github.com/wilsonehusin/soubise/pkg/storage"
+	"github.com/wilsonehusin/soubise/internal/broker"
+	"github.com/wilsonehusin/soubise/internal/storage"
 )
 
 func NewStorageFromPath(storagePath string, b broker.Broker) storage.Storage {
