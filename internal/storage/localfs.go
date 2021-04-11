@@ -46,10 +46,7 @@ func (s *LocalFsStorage) Create(id string, data []byte) error { // TODO: use str
 	s.broker.Lock()
 	err := s.backend.Write(id, data)
 	s.broker.Unlock()
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 func (s *LocalFsStorage) Get(id string) ([]byte, error) { // TODO: use stream?
 	s.broker.RLock()
@@ -64,10 +61,7 @@ func (s *LocalFsStorage) Delete(id string) error {
 	s.broker.Lock()
 	err := s.backend.Erase(id)
 	s.broker.Unlock()
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 func (s *LocalFsStorage) Kind() string {
 	return "localfs"
