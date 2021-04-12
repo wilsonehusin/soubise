@@ -35,6 +35,7 @@ testmultibuild: BUILD_FLAGS:=-ldflags '$(VERSION_FLAG) $(GIT_SHA_FLAG) $(COMPILE
 testmultibuild: multibuild
 
 .PHONY: testcontainer
+testcontainer: GIT_TAG:=zz_test-$(GIT_TAG)
 testcontainer: testbuild
 	docker build $(DOCKER_TAGS) .
 
