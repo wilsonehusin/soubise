@@ -23,21 +23,14 @@ import (
 	"time"
 )
 
-type Archive interface {
-	ToBytes() ([]byte, error)
-	GetName() string
-	GetContent() []byte
-	HasExpired() bool
-}
-
-type ArchiveObject struct {
+type Archive struct {
 	Name    string
 	Content []byte
 	Expiry  time.Time
 }
 
-func LoadArchiveObject(bin []byte) (*ArchiveObject, error) {
-	var data *ArchiveObject
+func LoadArchive(bin []byte) (*Archive, error) {
+	var data *Archive
 	decoder := gob.NewDecoder(bytes.NewBuffer(bin))
 
 	if err := decoder.Decode(&data); err != nil {
@@ -47,7 +40,7 @@ func LoadArchiveObject(bin []byte) (*ArchiveObject, error) {
 	return data, nil
 }
 
-func (a *ArchiveObject) ToBytes() ([]byte, error) {
+func (a *Archive) ToBytes() ([]byte, error) {
 	var bin bytes.Buffer
 	encoder := gob.NewEncoder(&bin)
 
@@ -58,14 +51,6 @@ func (a *ArchiveObject) ToBytes() ([]byte, error) {
 	return bin.Bytes(), nil
 }
 
-func (a *ArchiveObject) GetName() string {
-	return a.Name
-}
-
-func (a *ArchiveObject) GetContent() []byte {
-	return a.Content
-}
-
-func (a *ArchiveObject) HasExpired() bool {
+func (a *Archive) HasExpired() bool {
 	return a.Expiry.Before(time.Now())
 }

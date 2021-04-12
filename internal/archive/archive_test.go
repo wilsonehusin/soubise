@@ -28,7 +28,7 @@ func init() {
 	tomorrow = time.Now().Add(24 * time.Hour)
 }
 
-func (a *ArchiveObject) Equals(other ArchiveObject) bool {
+func (a *Archive) Equals(other Archive) bool {
 	if a.Name != other.Name {
 		return false
 	}
@@ -45,7 +45,7 @@ func (a *ArchiveObject) Equals(other ArchiveObject) bool {
 }
 
 func TestEncodeDecode(t *testing.T) {
-	obj := ArchiveObject{
+	obj := Archive{
 		Name:    "fakeFile_here.txt",
 		Content: []byte("not much how about you"),
 		Expiry:  tomorrow,
@@ -56,7 +56,7 @@ func TestEncodeDecode(t *testing.T) {
 		t.Fatalf("%v", err)
 	}
 
-	receivedData, err := LoadArchiveObject(receivedBin)
+	receivedData, err := LoadArchive(receivedBin)
 	if err != nil {
 		t.Fatalf("%v", err)
 	}

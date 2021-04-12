@@ -21,10 +21,10 @@ import (
 )
 
 const (
-	CreateObject = "/obj/create"
+	CreateObject = "/api/v1/obj/create"
 
-	GetObject   = "/obj"
-	GetObjectId = "/obj/{Id}"
+	GetObject   = "/api/v1/obj"
+	GetObjectId = "/api/v1/obj/{Id}"
 )
 
 func GetObjectWithId(id string) string {

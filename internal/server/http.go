@@ -17,6 +17,7 @@ limitations under the License.
 package server
 
 import (
+	"container/heap"
 	"context"
 	"fmt"
 	"net/http"
@@ -24,23 +25,37 @@ import (
 	"time"
 
 	"github.com/rs/zerolog/log"
+
+	"github.com/wilsonehusin/soubise/internal/storage"
 )
 
+type Config struct {
+	Host           string
+	Port           int
+	PreCheckExpiry bool
+	ActiveExpiry   bool
+	TickExpiry     time.Duration
+}
+
 type HttpServer struct {
-	Host   string
-	Port   int
-	Router http.Handler
-	server *http.Server
+	Config     Config
+	Router     http.Handler
+	ctx        context.Context
+	cancelFunc context.CancelFunc
+	server     *http.Server
 }
 
 func (h *HttpServer) PreCheck() error {
 	errs := []string{}
 
-	if h.Host == "" {
+	if h.Config.Host == "" {
 		errs = append(errs, "Host cannot be empty")
 	}
-	if h.Port == 0 {
+	if h.Config.Port == 0 {
 		errs = append(errs, "Port cannot be empty")
+	}
+	if h.cancelFunc == nil {
+		h.ctx, h.cancelFunc = context.WithCancel(context.Background())
 	}
 
 	if len(errs) > 0 {
@@ -55,8 +70,41 @@ func (h *HttpServer) Start() error {
 	}
 
 	h.server = &http.Server{
-		Addr:    fmt.Sprintf(":%d", h.Port),
+		Addr:    fmt.Sprintf(":%d", h.Config.Port),
 		Handler: h.Router,
+	}
+
+	if h.Config.ActiveExpiry {
+		interval := 1 * time.Second
+		if h.Config.TickExpiry != 0 {
+			interval = h.Config.TickExpiry
+		}
+		log.Info().Int64("Duration", int64(interval)).Msg("actively checking expired archives")
+		go func() {
+			heap.Init(storage.ExpiryHeap)
+			ticker := time.NewTicker(interval)
+			for {
+				select {
+				case <-ticker.C:
+					for {
+						if storage.ExpiryHeap.Len() > 0 && (*storage.ExpiryHeap)[0].HasExpired() {
+							expiredTag := heap.Pop(storage.ExpiryHeap).(storage.ExpiryTag)
+							log.Debug().
+								Time("Expiry", expiredTag.Expiry).
+								Str("Id", expiredTag.Id).
+								Msg("found expired archive, deleting")
+							err := storage.Delete(expiredTag.Id)
+							log.Err(err).Str("Id", expiredTag.Id).Msg("delete expired archive")
+						} else {
+							break
+						}
+					}
+				case <-h.ctx.Done():
+					// TODO: save heap state
+					return
+				}
+			}
+		}()
 	}
 
 	go func() {
@@ -80,10 +128,4 @@ func (h *HttpServer) Stop() error {
 
 func (h *HttpServer) IsActive() bool {
 	return h.server != nil
-}
-
-func (h *HttpServer) SetAddr(host string, port int) error {
-	h.Host = host
-	h.Port = port
-	return nil
 }

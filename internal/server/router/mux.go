@@ -18,6 +18,7 @@ package router
 
 import (
 	"bytes"
+	"container/heap"
 	"fmt"
 	"io"
 	"net/http"
@@ -57,7 +58,8 @@ func requestLogger(r *http.Request) *zerolog.Logger {
 func createObject(w http.ResponseWriter, r *http.Request) {
 	bodyBuffer := bytes.NewBuffer([]byte{})
 	if _, err := io.Copy(bodyBuffer, r.Body); err != nil {
-		requestLogger(r).Fatal().Err(err).Send()
+		requestLogger(r).Error().Err(err).Send()
+		return
 	}
 
 	requestLogger(r).Debug().
@@ -65,14 +67,24 @@ func createObject(w http.ResponseWriter, r *http.Request) {
 			Str("Action", "create")).
 		Msg("processing archive")
 
-	// TODO: process expiry checks
+	bodyBytes := bodyBuffer.Bytes()
+	toStore, err := archive.LoadArchive(bodyBytes)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		requestLogger(r).Error().
+			Err(err).Msg("request does not form Archive")
+		return
+	}
 
-	id, err := storage.Create(bodyBuffer.Bytes())
+	id, err := storage.Create(bodyBytes)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		requestLogger(r).Fatal().
-			Err(err).Send()
+		requestLogger(r).Error().
+			Err(err).Msg("create object")
+		return
 	}
+
+	heap.Push(storage.ExpiryHeap, storage.ExpiryTag{Id: id, Expiry: toStore.Expiry})
 
 	requestLogger(r).Info().
 		Dict("Storage", zerolog.Dict().
@@ -81,7 +93,8 @@ func createObject(w http.ResponseWriter, r *http.Request) {
 		Msg("created archive")
 
 	if _, err := w.Write([]byte(id)); err != nil {
-		requestLogger(r).Fatal().Err(err).Send()
+		requestLogger(r).Error().Err(err).Send()
+		return
 	}
 }
 
@@ -101,7 +114,7 @@ func getObject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	objArchive, err := archive.LoadArchiveObject(obj)
+	objArchive, err := archive.LoadArchive(obj)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		requestLogger(r).Error().

@@ -92,8 +92,12 @@ func serverRun() {
 	mux := router.NewMux()
 	webserver := server.HttpServer{
 		Router: mux,
-		Host:   serverOpts.Host,
-		Port:   serverOpts.Port,
+		Config: server.Config{
+			Host:           serverOpts.Host,
+			Port:           serverOpts.Port,
+			PreCheckExpiry: true,
+			ActiveExpiry:   true,
+		},
 	}
 
 	if err := webserver.Start(); err != nil {

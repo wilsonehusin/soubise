@@ -57,7 +57,7 @@ func Get(refPath string) error {
 	}
 
 	spinner.Start(" unpack", "reconstructing")
-	archiveToStore, err := archive.LoadArchiveObject(*archiveBlob)
+	archiveToStore, err := archive.LoadArchive(*archiveBlob)
 	if err != nil {
 		spinner.StopFail("failed")
 		return fmt.Errorf("unable to understand archive: %w", err)

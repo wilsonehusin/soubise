@@ -104,7 +104,7 @@ func Share(pathToFile string, lifetime time.Duration, server string) error {
 	return nil
 }
 
-func prepareShareable(pathToFile string, encryptionKey *crypto.Base64Data, lifetime time.Duration) (*archive.ArchiveObject, error) {
+func prepareShareable(pathToFile string, encryptionKey *crypto.Base64Data, lifetime time.Duration) (*archive.Archive, error) {
 	finfo, err := os.Stat(pathToFile)
 	if err != nil {
 		return nil, fmt.Errorf("unable to find %v: %w\n", pathToFile, err)
@@ -151,7 +151,7 @@ func prepareShareable(pathToFile string, encryptionKey *crypto.Base64Data, lifet
 	}
 	spinner.Stop("done")
 
-	return &archive.ArchiveObject{
+	return &archive.Archive{
 		Name:    name,
 		Content: *encrypted,
 		Expiry:  expiry,
